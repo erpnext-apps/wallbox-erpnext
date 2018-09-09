@@ -39,6 +39,9 @@ frappe.query_reports["Serialized Stock Balance"] = {
 			"fieldtype": "Link",
 			"width": "80",
 			"options": "Item",
+			"filters": {
+				"has_serial_no": 1
+			},
 			"get_query": function() {
 				return {
 					query: "erpnext.controllers.queries.item_query"

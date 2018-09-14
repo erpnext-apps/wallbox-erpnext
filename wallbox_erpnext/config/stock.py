@@ -12,6 +12,12 @@ def get_data():
 					"name": "Serialized Stock Balance",
 					"doctype": "Stock Ledger Entry"
 				},
+				{
+					"type": "report",
+					"is_query_report": True,
+					"name": "Manufacturing Lead Time",
+					"doctype": "Sales Order"
+				}
 			]
 		}
 	]

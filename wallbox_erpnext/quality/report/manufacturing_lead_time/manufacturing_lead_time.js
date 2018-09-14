@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Manufacturing Lead TIme"] = {
+frappe.query_reports["Manufacturing Lead Time"] = {
 	"filters": [
 		{
 			"fieldname":"from_date",

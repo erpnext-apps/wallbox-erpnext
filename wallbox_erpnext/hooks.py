@@ -11,6 +11,17 @@ app_color = "#5F9EA0"
 app_email = "info@frappe.io"
 app_license = "MIT"
 
+fixtures = [{"dt":"Custom Field", "filters": [["fieldname", "in", ("wb_submission_date", "wb_submitted_by")]]}]
+
+doc_events = {
+	"Sales Order": {
+		"on_submit": "wallbox_erpnext.quality.utils.update_submission"
+	},
+	"Delivery Note": {
+		"on_submit": "wallbox_erpnext.quality.utils.update_submission"
+	}
+}
+
 # Includes in <head>
 # ------------------
 

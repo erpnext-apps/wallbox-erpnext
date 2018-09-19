@@ -11,7 +11,7 @@ app_color = "#5F9EA0"
 app_email = "info@frappe.io"
 app_license = "MIT"
 
-fixtures = [{"dt":"Custom Field", "filters": [["fieldname", "in", ("wb_submission_date", "wb_submitted_by")]]}]
+fixtures = [{"dt":"Custom Field", "filters": [["fieldname", "in", ("wb_submission_date", "wb_submitted_by", "wb_is_not_standard")]]}]
 
 doc_events = {
 	"Sales Order": {

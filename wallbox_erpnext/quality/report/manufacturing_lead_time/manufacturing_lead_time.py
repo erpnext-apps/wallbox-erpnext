@@ -14,8 +14,8 @@ def get_columns():
 	columns = [
 		_("Customer")+":Link/Customer:120",
 		_("Sales Order")+":Link/Sales Order:150",
-		_("Ordered")+":Date:100",
-		_("Submission")+":Datetime:100",
+		_("Sales Order Date")+":Date:100",
+		_("Sales Order Submission Date")+":Datetime:100",
 		_("Item")+":Link/Item:100",
 		_("Item Name")+"::150",
 		_("Item Group")+":Link/Item Group:100",
@@ -26,8 +26,8 @@ def get_columns():
 		_("Booked")+":Int:50",
 		_("Work Order Date")+":Date:100",
 		_("Expected Delivery")+":Date:100",
-		_("Delivery Date")+":Date:100",
-		_("Submission")+":Datetime:100",
+		_("Delivery Note Date")+":Date:100",
+		_("Delivery Note Submission Date")+":Datetime:100",
 		_("Delay")+":Int:50"
 	]
 	return columns

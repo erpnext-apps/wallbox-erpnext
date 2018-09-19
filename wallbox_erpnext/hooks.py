@@ -15,6 +15,7 @@ fixtures = [{"dt":"Custom Field", "filters": [["fieldname", "in", ("wb_submissio
 
 doc_events = {
 	"Sales Order": {
+		"before_submit": "wallbox_erpnext.quality.utils.update_delivery_by_lead_days",
 		"on_submit": "wallbox_erpnext.quality.utils.update_submission"
 	},
 	"Delivery Note": {

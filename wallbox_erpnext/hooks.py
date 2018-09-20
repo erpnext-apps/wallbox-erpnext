@@ -11,10 +11,12 @@ app_color = "#5F9EA0"
 app_email = "info@frappe.io"
 app_license = "MIT"
 
-fixtures = [{"dt":"Custom Field", "filters": [["fieldname", "in", ("wb_submission_date", "wb_submitted_by")]]}]
+fixtures = [{"dt":"Custom Field", "filters": [["fieldname", "in", ("wb_submission_date", 
+	"wb_submitted_by", "wb_is_not_standard", "wb_apply_lead_time")]]}]
 
 doc_events = {
 	"Sales Order": {
+		"before_submit": "wallbox_erpnext.quality.utils.update_delivery_by_lead_days",
 		"on_submit": "wallbox_erpnext.quality.utils.update_submission"
 	},
 	"Delivery Note": {

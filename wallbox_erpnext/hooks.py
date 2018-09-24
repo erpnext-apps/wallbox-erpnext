@@ -12,7 +12,7 @@ app_email = "info@frappe.io"
 app_license = "MIT"
 
 fixtures = [{"dt":"Custom Field", "filters": [["fieldname", "in", ("wb_submission_date", 
-	"wb_submitted_by", "wb_is_not_standard", "wb_apply_lead_time")]]}]
+	"wb_submitted_by", "wb_is_not_standard", "wb_apply_lead_time", "wb_lead_time_by_item_group")]]}]
 
 doc_events = {
 	"Sales Order": {

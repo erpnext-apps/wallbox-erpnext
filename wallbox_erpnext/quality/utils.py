@@ -20,6 +20,15 @@ def update_delivery_by_lead_days(doc, method):
 		item_group = None
 		group_lead_time = None
 		group_qty = {}
+		group_delivery_date = {}
+		holidays = []
+		holiday_list = frappe.get_value("Company", doc.company, "default_holiday_list")
+		if holiday_list:
+			from_date, to_date =  frappe.get_value("Holiday List", holiday_list,
+				["from_date", "to_date"])
+			if so_delivery_date > getdate(from_date) and so_delivery_date < getdate(to_date):
+				holidays = frappe.db.sql_list("""select holiday_date from tabHoliday
+					where parent=%s""", (holiday_list))
 		if doc.wb_lead_time_by_item_group:
 			group_qty = get_qty_by_item_group(doc)
 
@@ -27,9 +36,10 @@ def update_delivery_by_lead_days(doc, method):
 			return item.qty
 
 		for item in doc.items:
+			# update group_lead_time if item group changed from that of last iteration
 			if item.item_group != item_group:
 				lead_time = frappe.db.exists("Wallbox Manufacturing Lead Time", 
-					{"item_group": item.item_group, "enabled": 1})
+					{"company":doc.company, "item_group": item.item_group, "enabled": 1})
 				if lead_time:
 					lead_time = frappe.get_doc("Wallbox Manufacturing Lead Time", lead_time)
 					group_lead_time = lead_time
@@ -38,28 +48,62 @@ def update_delivery_by_lead_days(doc, method):
 					group_lead_time = None
 				item_group = item_group
 			if group_lead_time:
-				for lead in group_lead_time.lead_days:
-					if doc.wb_lead_time_by_item_group:
-						if lead.qty >= group_qty[item.item_group]:
-							item.delivery_date = add_days(getdate(), lead.days)
-							break
+				grp_qty=0
+				if doc.wb_lead_time_by_item_group:
+					grp_qty = group_qty[item.item_group]
+
+				item.delivery_date = calc_lead_date(group_lead_time, item.qty, 
+					holidays, True, grp_qty)
+
+				# add lead time for non standard Items
+				if frappe.db.get_value("Item", item.item_code, "wb_is_not_standard") and\
+					group_lead_time.lead_days_for_custom:
+					if holidays:
+						item.delivery_date = get_working_lead_date(holidays, 
+							item.delivery_date, group_lead_time.lead_days_for_custom)
 					else:
-						if lead.qty >= item.qty:
-							item.delivery_date = add_days(getdate(), lead.days)
-							break
-				if frappe.db.get_value("Item", item.item_code, "wb_is_not_standard"):
-					if group_lead_time.lead_days_for_custom:
 						item.delivery_date = add_days(item.delivery_date, 
 							group_lead_time.lead_days_for_custom)
+
+					# if lead time by item group update all items in same 
+					# item group with largest delivery date
+					if doc.wb_lead_time_by_item_group:
+						if item.item_group not in group_delivery_date:
+							group_delivery_date[item.item_group] = item.delivery_date
+						elif getdate(group_delivery_date[item.item_group]) < getdate(item.delivery_date):
+							group_delivery_date[item.item_group] = item.delivery_date
 			if getdate(so_delivery_date) < getdate(item.delivery_date):
 				so_delivery_date = item.delivery_date
 		doc.delivery_date = so_delivery_date
 
+def calc_lead_date(lead_time, qty, holidays, by_group=False, grp_qty=0):
+	for lead in lead_time.lead_days:
+		if by_group:
+			if lead.qty >= grp_qty:
+				if holidays:
+					return get_working_lead_date(holidays, getdate(), lead.days)
+				else:
+					return add_days(getdate(), lead.days)
+		else:
+			if lead.qty >= qty:
+				if holidays:
+					return get_working_lead_date(holidays, getdate(), lead.days)
+				else:
+					return add_days(getdate(), lead.days)
+
 def get_qty_by_item_group(doc):
 	group_qty = {}
 	for item in doc.items:
-		if item.item_group in group_qty:
-			group_qty[item.item_group] += item.qty
-		else:
+		if item.item_group not in group_qty:
+			group_qty[item.item_group] = item.qty
+		elif group_qty[item.item_group] < item.qty:
 			group_qty[item.item_group] = item.qty
 	return group_qty
+
+def get_working_lead_date(holidays, lead_date, lead_days):
+	days_working = 0
+	while days_working < lead_days:
+		lead_date = add_days(lead_date, 1)
+		if lead_date not in holidays:
+			days_working += 1
+	return lead_date

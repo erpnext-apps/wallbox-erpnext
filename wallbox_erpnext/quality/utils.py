@@ -22,14 +22,14 @@ def update_delivery_by_lead_days(doc, method):
 		item_group_lt = {}
 		holidays = []
 		holiday_list = frappe.get_value("Company", doc.company, "default_holiday_list")
-		# create holiday list
+		# get list of holidays
 		if holiday_list:
 			from_date, to_date =  frappe.get_value("Holiday List", holiday_list,
 				["from_date", "to_date"])
 			if so_delivery_date > getdate(from_date) and so_delivery_date < getdate(to_date):
 				holidays = frappe.db.sql_list("""select holiday_date from tabHoliday
 					where parent=%s""", (holiday_list))
-		# If lead time by group find the highest lead date
+		# if lead time by group find the highest lead date
 		if doc.wb_lead_time_by_item_group:
 			item_group_lt = get_data_by_item_group(doc)
 			for item_group in item_group_lt:
@@ -37,14 +37,15 @@ def update_delivery_by_lead_days(doc, method):
 				if lead_time:
 					item_group_lt[item_group]["delivery_date"] = calc_lead_date(lead_time, 0,
 						holidays, True, item_group_lt[item_group]["qty"])
-					if "has_custom" in item_group and lead_time.lead_days_for_custom:
+					if "has_custom" in item_group_lt[item_group] and lead_time.lead_days_for_custom:
 						item_group_lt[item_group]["delivery_date"] = get_working_lead_date(holidays, 
 							item_group_lt[item_group]["delivery_date"], lead_time.lead_days_for_custom)
+					# update delivery_date of SO if date greater
 					if getdate(so_delivery_date) < getdate(item_group_lt[item_group]["delivery_date"]):
 						so_delivery_date = item_group_lt[item_group]["delivery_date"]
 
 		for item in doc.items:
-			# If lead time by group apply the lt in item_group_lt
+			# if lead time by group apply the lt in item_group_lt
 			if doc.wb_lead_time_by_item_group:
 				if "delivery_date" in item_group_lt[item.item_group]:
 					item.delivery_date = item_group_lt[item.item_group]["delivery_date"]
@@ -66,6 +67,7 @@ def update_delivery_by_lead_days(doc, method):
 						item.delivery_date = add_days(item.delivery_date, 
 							lead_time.lead_days_for_custom)
 
+			# update delivery_date of SO if date greater
 			if getdate(so_delivery_date) < getdate(item.delivery_date):
 				so_delivery_date = item.delivery_date
 		doc.delivery_date = so_delivery_date

@@ -24,8 +24,9 @@ def get_columns():
 		_("Qty")+":Int:50",
 		_("Delivered")+":Int:50",
 		_("Booked")+":Int:50",
-		_("Work Order Date")+":Date:100",
 		_("Expected Delivery")+":Date:100",
+		_("Work Order Date")+":Date:100",
+		_("Work Order Delivery Date")+":Date:100",
 		_("Delivery Note Date")+":Date:100",
 		_("Delivery Note Submission Date")+":Datetime:100",
 		_("Delay")+":Int:50"
@@ -75,7 +76,7 @@ def get_data(filters):
 			report_data = [item["customer"], item["name"], item["transaction_date"],
 				item["wb_submission_date"], item["item_code"], item["item_name"], item["item_group"],
 				item["delivery_status"], item["qty"], item["delivered_qty"], booked_qty,
-				item["planned_start_date"], item["expected_delivery_date"]]
+				item["delivery_date"], item["planned_start_date"], item["expected_delivery_date"]]
 			dni = frappe.db.sql("""select dn.posting_date, dn.wb_submission_date from `tabDelivery Note Item`
 				dni join `tabDelivery Note` dn on dni.parent=dn.name where
 				dni.against_sales_order=%s and dni.item_code=%s order by

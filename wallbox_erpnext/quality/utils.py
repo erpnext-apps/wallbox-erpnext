@@ -83,19 +83,31 @@ def get_lead_time(company, item_group):
 	return lead_time
 
 def calc_lead_date(lead_time, qty, holidays, by_group=False, grp_qty=0):
+	lead_date = None
+	lead_days = 0
 	for lead in lead_time.lead_days:
+		lead_days = lead.days
 		if by_group:
 			if lead.qty >= grp_qty:
-				if holidays:
-					return get_working_lead_date(holidays, getdate(), lead.days)
-				else:
-					return add_days(getdate(), lead.days)
+				lead_date = get_lead_days(holidays, lead.days)
+				break
 		else:
 			if lead.qty >= qty:
-				if holidays:
-					return get_working_lead_date(holidays, getdate(), lead.days)
-				else:
-					return add_days(getdate(), lead.days)
+				lead_date = get_lead_days(holidays, lead.days)
+				break
+	# if qty grater than the largest configured, lead date will be None
+	# apply the days for largest configured qty
+	if lead_date:
+		return lead_date
+	else:
+		return get_lead_days(holidays, lead_days)
+
+def get_lead_days(holidays, lead_days):
+	if holidays:
+		lead_date = get_working_lead_date(holidays, getdate(), lead_days)
+	else:
+		lead_date = add_days(getdate(), lead_days)
+	return lead_date
 
 def get_data_by_item_group(doc):
 	item_group_lt = {}

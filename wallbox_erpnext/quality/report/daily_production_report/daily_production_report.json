@@ -1,0 +1,27 @@
+{
+ "add_total_row": 0,
+ "creation": "2018-09-27 20:11:01.042048",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "idx": 0,
+ "is_standard": "Yes",
+ "modified": "2018-09-28 13:34:00.530260",
+ "modified_by": "Administrator",
+ "module": "Quality",
+ "name": "Daily Production Report",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT\n  im.item_code as \"Item:Link/Item:100\",\n  im.item_name as \"Item Name:Data:200\",\n  im.item_group as \"Item Group:Link/Item Group:150\",\n  sum(sd.qty) as \"Produced Quantity:Int:100\"\nFROM\n  `tabItem` im join `tabStock Entry Detail` sd\n  on sd.item_code=im.name  join `tabStock Entry` se on sd.parent=se.name\nWHERE se.docstatus=1 \nAND se.purpose=\"Manufacture\" \nAND se.posting_date=DATE_ADD(CURDATE(), INTERVAL -1 DAY) \nAND sd.s_warehouse IS NULL \nGROUP BY im.name",
+ "ref_doctype": "Stock Entry",
+ "report_name": "Daily Production Report",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "Manufacturing Manager"
+  },
+  {
+   "role": "Stock Manager"
+  }
+ ]
+}

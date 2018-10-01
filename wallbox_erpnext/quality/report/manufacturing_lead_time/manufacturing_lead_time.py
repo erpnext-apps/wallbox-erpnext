@@ -16,11 +16,11 @@ def get_columns():
 		_("Sales Order")+":Link/Sales Order:150",
 		_("Sales Order Date")+":Date:100",
 		_("Sales Order Submission Date")+":Datetime:100",
+		_("Sales Order Status")+":Data:50",
 		_("Item")+":Link/Item:100",
 		_("Item Name")+"::150",
 		_("Item Group")+":Link/Item Group:100",
 		_("Status")+":Data:100",
-		# _("Delivery Status")+":Data:50",
 		_("Qty")+":Int:50",
 		_("Delivered")+":Int:50",
 		_("Booked")+":Int:50",
@@ -57,9 +57,9 @@ def get_data(filters):
 	conditions = get_conditions(filters)
 
 	so_details = frappe.db.sql("""select so.customer, so.name, so.transaction_date,
-		soi.item_code, soi.item_name, soi.item_group, so.delivery_status, so.wb_submission_date,
-		soi.qty, soi.delivered_qty, soi.delivery_date, wo.planned_start_date,
-		wo.expected_delivery_date
+		soi.item_code, soi.item_name, soi.item_group, so.status, so.delivery_status, 
+		so.wb_submission_date, soi.qty, soi.delivered_qty, soi.delivery_date, 
+		wo.planned_start_date, wo.expected_delivery_date
 		from `tabSales Order Item` soi join `tabSales Order` so on soi.parent=so.name
 		left join `tabWork Order` wo on (soi.item_code=wo.production_item and
 		so.name=wo.sales_order) where {}""".format(" and ".join(conditions)), filters, as_dict=1)
@@ -74,8 +74,8 @@ def get_data(filters):
 			else:
 				booked_qty = 0
 			report_data = [item["customer"], item["name"], item["transaction_date"],
-				item["wb_submission_date"], item["item_code"], item["item_name"], item["item_group"],
-				item["delivery_status"], item["qty"], item["delivered_qty"], booked_qty,
+				item["wb_submission_date"], item["status"], item["item_code"], item["item_name"], 
+				item["item_group"],	item["delivery_status"], item["qty"], item["delivered_qty"], booked_qty,
 				item["delivery_date"], item["planned_start_date"], item["expected_delivery_date"]]
 			dni = frappe.db.sql("""select dn.posting_date, dn.wb_submission_date from `tabDelivery Note Item`
 				dni join `tabDelivery Note` dn on dni.parent=dn.name where

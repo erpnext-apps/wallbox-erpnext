@@ -73,16 +73,19 @@ def update_delivery_by_lead_days(doc, method):
 		doc.delivery_date = so_delivery_date
 
 def get_lead_time(company, item_group):
-	lead_time = frappe.db.exists("Wallbox Manufacturing Lead Time",
-		{"company":company, "item_group": item_group, "enabled": 1})
 
 	def get_key(item):
 		return item.qty
 
-	if lead_time:
-		lead_time = frappe.get_doc("Wallbox Manufacturing Lead Time", lead_time)
-		lead_time.lead_days = sorted(lead_time.lead_days, key=get_key)
-	return lead_time
+	while item_group:
+		lead_time = frappe.db.exists("Wallbox Manufacturing Lead Time",
+			{"company":company, "item_group": item_group, "enabled": 1})
+		if lead_time:
+			lead_time = frappe.get_doc("Wallbox Manufacturing Lead Time", lead_time)
+			lead_time.lead_days = sorted(lead_time.lead_days, key=get_key)
+			return lead_time
+		item_group = frappe.get_value("Item Group", item_group, "parent_item_group")
+	return None
 
 def calc_lead_date(lead_time, qty, holidays, by_group=False, grp_qty=0):
 	lead_date = None

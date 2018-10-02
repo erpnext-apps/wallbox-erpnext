@@ -121,7 +121,7 @@ def get_data_by_item_group(doc):
 			item_group_lt[item.item_group] = {}
 			item_group_lt[item.item_group]["qty"] = item.qty
 		elif item_group_lt[item.item_group]["qty"] < item.qty:
-			item_group_lt[item.item_group]["qty"] = item.qty
+			item_group_lt[item.item_group]["qty"] += item.qty
 		if frappe.db.get_value("Item", item.item_code, "wb_is_not_standard"):
 			item_group_lt[item.item_group]["has_custom"] = 1
 	return item_group_lt

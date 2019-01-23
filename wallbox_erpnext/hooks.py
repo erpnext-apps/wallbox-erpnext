@@ -11,6 +11,8 @@ app_color = "#5F9EA0"
 app_email = "info@frappe.io"
 app_license = "MIT"
 
+# Commented fixtures as it overwrites permlevel of custom fields.
+# If enabled, custom fields must be exported from db to custom app first.
 #fixtures = [{"dt":"Custom Field", "filters": [["fieldname", "in", ("wb_submission_date", 
 #	"wb_submitted_by", "wb_is_not_standard", "wb_apply_lead_time", "wb_lead_time_by_item_group")]]}]
 
